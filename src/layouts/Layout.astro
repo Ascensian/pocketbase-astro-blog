@@ -1,23 +1,112 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+const { title } = Astro.props;
+---
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        background: #0a0e13;
+        color: #c8ddd6;
+        font-family: 'JetBrains Mono', monospace;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      nav {
+        background: #0a0e13;
+        border-bottom: 0.5px solid #1e2a35;
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo {
+        font-size: 14px;
+        font-weight: 600;
+        color: #00e5a0;
+        text-decoration: none;
+        letter-spacing: 0.05em;
+      }
+
+      .logo span { color: #4a6a7c; }
+
+      .nav-links {
+        display: flex;
+        gap: 24px;
+        list-style: none;
+      }
+
+      .nav-links a {
+        font-size: 11px;
+        color: #4a6a7c;
+        text-decoration: none;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: color 0.2s;
+      }
+
+      .nav-links a:hover { color: #00e5a0; }
+
+      main { flex: 1; }
+
+      footer {
+        background: #060a0d;
+        border-top: 0.5px solid #1e2a35;
+        padding: 10px 32px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .status-item {
+        font-size: 10px;
+        color: #2e4a5a;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .status-dot {
+        width: 5px;
+        height: 5px;
+        background: #00e5a0;
+        border-radius: 50%;
+      }
+
+      .divider-v {
+        width: 0.5px;
+        height: 12px;
+        background: #1e2a35;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="logo" href="/"><span>//</span> indexer<span>.</span>blog</a>
+      <ul class="nav-links">
+        <li><a href="/">Articles</a></li>
+      </ul>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <div class="status-item">
+        <span class="status-dot"></span>PocketBase · local
+      </div>
+      <div class="divider-v"></div>
+      <div class="status-item">Astro SSR · v5.x</div>
+    </footer>
+  </body>
+</html>

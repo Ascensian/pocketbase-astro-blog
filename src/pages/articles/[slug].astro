@@ -1,4 +1,5 @@
 ---
+import Layout from '../../layouts/Layout.astro';
 import { pb } from '../../lib/pocketbase';
 
 const { slug } = Astro.params;
@@ -8,15 +9,114 @@ const article = await pb.collection('articles').getFirstListItem(
 );
 ---
 
-<html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <title>{article.title}</title>
-  </head>
-  <body>
-    <a href="/">← Retour</a>
+<Layout title={article.title}>
+  <style>
+    .article-header {
+      padding: 40px 32px 32px;
+      border-bottom: 0.5px solid #1e2a35;
+      max-width: 720px;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #4a6a7c;
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+
+    .back:hover { color: #00e5a0; }
+    .back::before { content: '←'; }
+
+    .article-tag {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #00e5a0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag-dot {
+      width: 4px;
+      height: 4px;
+      background: #00e5a0;
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #e8f4f0;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    .article-meta {
+      font-size: 10px;
+      color: #2e4a5a;
+      display: flex;
+      gap: 16px;
+    }
+
+    .article-body {
+      padding: 40px 32px;
+      max-width: 720px;
+      font-size: 14px;
+      color: #8aaab8;
+      line-height: 1.9;
+    }
+
+    .article-body p { margin-bottom: 20px; }
+
+    .article-body h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #c8ddd6;
+      margin: 32px 0 12px;
+      padding-left: 12px;
+      border-left: 2px solid #00e5a0;
+    }
+
+    .article-body code {
+      background: #0d1620;
+      border: 0.5px solid #1e2a35;
+      padding: 2px 6px;
+      font-size: 12px;
+      color: #00e5a0;
+      border-radius: 3px;
+    }
+
+    .article-body pre {
+      background: #0d1620;
+      border: 0.5px solid #1e2a35;
+      padding: 20px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #8aaab8;
+    }
+  </style>
+
+  <div class="article-header">
+    <a class="back" href="/">Retour</a>
+    <div class="article-tag">
+      <span class="tag-dot"></span>Article
+    </div>
     <h1>{article.title}</h1>
-    <p>{new Date(article.created).toLocaleDateString('fr-FR')}</p>
-    <div set:html={article.content} />
-  </body>
-</html>
+    <div class="article-meta">
+      <span>{new Date(article.created).toLocaleDateString('fr-FR')}</span>
+    </div>
+  </div>
+
+  <div class="article-body">
+    <Fragment set:html={article.content} />
+  </div>
+</Layout>

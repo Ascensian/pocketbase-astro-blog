@@ -1,4 +1,5 @@
 ---
+import Layout from '../layouts/Layout.astro';
 import { pb } from '../lib/pocketbase';
 
 const articles = await pb.collection('articles').getFullList({
@@ -7,21 +8,199 @@ const articles = await pb.collection('articles').getFullList({
 });
 ---
 
-<html lang="fr">
-  <head>
-    <meta charset="utf-8" />
-    <title>Mon Blog</title>
-  </head>
-  <body>
-    <h1>Mon Blog</h1>
+<Layout title="indexer.blog">
+  <style>
+    .hero {
+      padding: 40px 32px 32px;
+      border-bottom: 0.5px solid #1e2a35;
+    }
 
-    {articles.map((article) => (
-      <article>
-        <h2>
-          <a href={`/articles/${article.slug}`}>{article.title}</a>
-        </h2>
-        <p>{new Date(article.created).toLocaleDateString('fr-FR')}</p>
-      </article>
-    ))}
-  </body>
-</html>
+    .hero-label {
+      font-size: 10px;
+      color: #00e5a0;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-label::before { content: '> '; color: #4a6a7c; }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #e8f4f0;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .hero-title em { font-style: normal; color: #00e5a0; }
+
+    .hero-desc {
+      font-size: 12px;
+      color: #4a6a7c;
+      line-height: 1.7;
+      max-width: 460px;
+    }
+
+    .articles-section { padding: 28px 32px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      color: #4a6a7c;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 0.5px;
+      background: #1e2a35;
+    }
+
+    .articles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .article-card {
+      border: 0.5px solid #1e2a35;
+      padding: 16px;
+      background: #0d1620;
+      position: relative;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.2s;
+    }
+
+    .article-card:hover { border-color: #1e4a3a; }
+
+    .article-card.featured {
+      grid-column: 1 / -1;
+      border-color: #1e4a3a;
+      background: #0a1a14;
+    }
+
+    .block-number {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 9px;
+      color: #1e3a2a;
+    }
+
+    .card-tag {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #00e5a0;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag-dot {
+      width: 4px;
+      height: 4px;
+      background: #00e5a0;
+      border-radius: 50%;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #c8ddd6;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .article-card.featured .card-title {
+      font-size: 17px;
+      color: #e8f4f0;
+    }
+
+    .card-excerpt {
+      font-size: 11px;
+      color: #3a5a6a;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 0.5px solid #1e2a35;
+    }
+
+    .read-more {
+      font-size: 10px;
+      color: #00e5a0;
+      letter-spacing: 0.1em;
+    }
+
+    .read-more::after { content: ' →'; }
+
+    .card-meta {
+      font-size: 10px;
+      color: #2e4a5a;
+      display: flex;
+      gap: 12px;
+    }
+  </style>
+
+  <div class="hero">
+    <div class="hero-label">Ethereum · Uniswap V3 · DevOps</div>
+    <h1 class="hero-title">
+      Construire un indexeur<br>
+      <em>blockchain</em> robuste,<br>
+      de bout en bout.
+    </h1>
+    <p class="hero-desc">
+      Architecture, infra as code, observabilité et gestion des reorgs — documentés en temps réel.
+    </p>
+  </div>
+
+  <div class="articles-section">
+    <div class="section-header">
+      <span class="section-label">// articles récents</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="articles-grid">
+      {articles.map((article, index) => (
+        <a
+          href={`/articles/${article.slug}`}
+          class={`article-card ${index === 0 ? 'featured' : ''}`}
+        >
+          <div class="block-number">#{String(index + 1).padStart(4, '0')}</div>
+          <div class="card-tag">
+            <span class="tag-dot"></span>Article
+          </div>
+          <div class="card-title">{article.title}</div>
+          {index === 0 && (
+            <div class="card-excerpt">
+              {article.content?.replace(/<[^>]*>/g, '').slice(0, 120)}...
+            </div>
+          )}
+          <div class="card-footer">
+            <span class="read-more">Lire</span>
+            <div class="card-meta">
+              <span>{new Date(article.created).toLocaleDateString('fr-FR')}</span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>
