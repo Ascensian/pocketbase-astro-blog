@@ -1,0 +1,27 @@
+---
+import { pb } from '../lib/pocketbase';
+
+const articles = await pb.collection('articles').getFullList({
+  filter: 'published = true',
+  sort: '-created',
+});
+---
+
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mon Blog</title>
+  </head>
+  <body>
+    <h1>Mon Blog</h1>
+
+    {articles.map((article) => (
+      <article>
+        <h2>
+          <a href={`/articles/${article.slug}`}>{article.title}</a>
+        </h2>
+        <p>{new Date(article.created).toLocaleDateString('fr-FR')}</p>
+      </article>
+    ))}
+  </body>
+</html>

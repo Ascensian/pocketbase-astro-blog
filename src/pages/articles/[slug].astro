@@ -1,0 +1,22 @@
+---
+import { pb } from '../../lib/pocketbase';
+
+const { slug } = Astro.params;
+
+const article = await pb.collection('articles').getFirstListItem(
+  `slug = "${slug}"`
+);
+---
+
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>{article.title}</title>
+  </head>
+  <body>
+    <a href="/">← Retour</a>
+    <h1>{article.title}</h1>
+    <p>{new Date(article.created).toLocaleDateString('fr-FR')}</p>
+    <div set:html={article.content} />
+  </body>
+</html>
