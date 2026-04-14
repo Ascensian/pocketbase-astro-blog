@@ -1,11 +1,30 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { pb } from '../lib/pocketbase';
+import Layout from "../layouts/Layout.astro";
+import { pb } from "../lib/pocketbase";
 
-const articles = await pb.collection('articles').getFullList({
-  filter: 'published = true',
-  sort: '-created',
+const articles = await pb.collection("articles").getFullList({
+  filter: "published = true",
+  sort: "-created",
 });
+
+function stripHtml(html: string) {
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&eacute;/g, "é")
+    .replace(/&egrave;/g, "è")
+    .replace(/&agrave;/g, "à")
+    .replace(/&ccedil;/g, "ç")
+    .replace(/&ecirc;/g, "ê")
+    .replace(/&ocirc;/g, "ô")
+    .replace(/&ucirc;/g, "û")
+    .replace(/&acirc;/g, "â")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&rsquo;/g, "'")
+    .replace(/&laquo;/g, "«")
+    .replace(/&raquo;/g, "»")
+    .slice(0, 120);
+}
 ---
 
 <Layout title="indexer.blog">
@@ -23,7 +42,10 @@ const articles = await pb.collection('articles').getFullList({
       margin-bottom: 12px;
     }
 
-    .hero-label::before { content: '> '; color: #4a6a7c; }
+    .hero-label::before {
+      content: "> ";
+      color: #4a6a7c;
+    }
 
     .hero-title {
       font-size: 28px;
@@ -33,7 +55,10 @@ const articles = await pb.collection('articles').getFullList({
       margin-bottom: 12px;
     }
 
-    .hero-title em { font-style: normal; color: #00e5a0; }
+    .hero-title em {
+      font-style: normal;
+      color: #00e5a0;
+    }
 
     .hero-desc {
       font-size: 12px;
@@ -42,7 +67,9 @@ const articles = await pb.collection('articles').getFullList({
       max-width: 460px;
     }
 
-    .articles-section { padding: 28px 32px; }
+    .articles-section {
+      padding: 28px 32px;
+    }
 
     .section-header {
       display: flex;
@@ -81,7 +108,9 @@ const articles = await pb.collection('articles').getFullList({
       transition: border-color 0.2s;
     }
 
-    .article-card:hover { border-color: #1e4a3a; }
+    .article-card:hover {
+      border-color: #1e4a3a;
+    }
 
     .article-card.featured {
       grid-column: 1 / -1;
@@ -149,7 +178,9 @@ const articles = await pb.collection('articles').getFullList({
       letter-spacing: 0.1em;
     }
 
-    .read-more::after { content: ' →'; }
+    .read-more::after {
+      content: " →";
+    }
 
     .card-meta {
       font-size: 10px;
@@ -162,12 +193,13 @@ const articles = await pb.collection('articles').getFullList({
   <div class="hero">
     <div class="hero-label">Ethereum · Uniswap V3 · DevOps</div>
     <h1 class="hero-title">
-      Construire un indexeur<br>
-      <em>blockchain</em> robuste,<br>
+      Construire un indexeur<br />
+      <em>blockchain</em> robuste,<br />
       de bout en bout.
     </h1>
     <p class="hero-desc">
-      Architecture, infra as code, observabilité et gestion des reorgs — documentés en temps réel.
+      Architecture, infra as code, observabilité et gestion des reorgs —
+      documentés en temps réel.
     </p>
   </div>
 
@@ -178,29 +210,36 @@ const articles = await pb.collection('articles').getFullList({
     </div>
 
     <div class="articles-grid">
-      {articles.map((article, index) => (
-        <a
-          href={`/articles/${article.slug}`}
-          class={`article-card ${index === 0 ? 'featured' : ''}`}
-        >
-          <div class="block-number">#{String(index + 1).padStart(4, '0')}</div>
-          <div class="card-tag">
-            <span class="tag-dot"></span>Article
-          </div>
-          <div class="card-title">{article.title}</div>
-          {index === 0 && (
-            <div class="card-excerpt">
-              {article.content?.replace(/<[^>]*>/g, '').slice(0, 120)}...
+      {
+        articles.map((article, index) => (
+          <a
+            href={`/articles/${article.slug}`}
+            class={`article-card ${index === 0 ? "featured" : ""}`}
+          >
+            <div class="block-number">
+              #{String(index + 1).padStart(4, "0")}
             </div>
-          )}
-          <div class="card-footer">
-            <span class="read-more">Lire</span>
-            <div class="card-meta">
-              <span>{new Date(article.created).toLocaleDateString('fr-FR')}</span>
+            <div class="card-tag">
+              <span class="tag-dot" />
+              Article
             </div>
-          </div>
-        </a>
-      ))}
+            <div class="card-title">{article.title}</div>
+            {index === 0 && (
+              <div class="card-excerpt">
+                {stripHtml(article.content || "")}...
+              </div>
+            )}
+            <div class="card-footer">
+              <span class="read-more">Lire</span>
+              <div class="card-meta">
+                <span>
+                  {new Date(article.created).toLocaleDateString("fr-FR")}
+                </span>
+              </div>
+            </div>
+          </a>
+        ))
+      }
     </div>
   </div>
 </Layout>
