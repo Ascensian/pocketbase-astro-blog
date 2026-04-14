@@ -7,14 +7,23 @@ const { title } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
       body {
         background: #0a0e13;
         color: #c8ddd6;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: "JetBrains Mono", monospace;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -37,7 +46,9 @@ const { title } = Astro.props;
         letter-spacing: 0.05em;
       }
 
-      .logo span { color: #4a6a7c; }
+      .logo span {
+        color: #4a6a7c;
+      }
 
       .nav-links {
         display: flex;
@@ -54,9 +65,13 @@ const { title } = Astro.props;
         transition: color 0.2s;
       }
 
-      .nav-links a:hover { color: #00e5a0; }
+      .nav-links a:hover {
+        color: #00e5a0;
+      }
 
-      main { flex: 1; }
+      main {
+        flex: 1;
+      }
 
       footer {
         background: #060a0d;
@@ -103,10 +118,20 @@ const { title } = Astro.props;
 
     <footer>
       <div class="status-item">
-        <span class="status-dot"></span>PocketBase · local
+        <span class="status-dot"></span>PocketBase · production
       </div>
       <div class="divider-v"></div>
       <div class="status-item">Astro SSR · v5.x</div>
+      <div class="divider-v"></div>
+      <div class="status-item">
+        <a
+          href="https://github.com/Ascensian/pocketbase-astro-blog"
+          target="_blank"
+          style="color: #4a6a7c; text-decoration: none; letter-spacing: 0.1em;"
+        >
+          Github
+        </a>
+      </div>
     </footer>
   </body>
 </html>
