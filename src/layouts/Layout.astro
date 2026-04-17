@@ -102,13 +102,44 @@ const { title } = Astro.props;
         height: 12px;
         background: #1e2a35;
       }
+
+      .live-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #00e5a0 !important;
+      }
+
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        background: #00e5a0;
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body>
     <nav>
       <a class="logo" href="/"><span>//</span> indexer<span>.</span>blog</a>
       <ul class="nav-links">
-        <li><a href="/">Articles</a></li>
+        <li>
+          <a href="#" class="live-btn">
+            <span class="live-dot"></span>Live system
+          </a>
+        </li>
       </ul>
     </nav>
 
