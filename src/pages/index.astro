@@ -196,57 +196,57 @@ function stripHtml(html: string) {
   </style>
 
   <div class="content-wrapper">
-  <div class="hero">
-    <div class="hero-label">Ethereum · Uniswap V3 · DevOps</div>
-    <h1 class="hero-title">
-      Construire un indexeur<br />
-      <em>blockchain</em> robuste,<br />
-      de bout en bout.
-    </h1>
-    <p class="hero-desc">
-      Architecture, infra as code, observabilité et gestion des reorgs —
-      documentés en temps réel.
-    </p>
-  </div>
-
-  <div class="articles-section">
-    <div class="section-header">
-      <span class="section-label">// articles récents</span>
-      <div class="section-line"></div>
+    <div class="hero">
+      <div class="hero-label">Blockchain · SRE · DevOps</div>
+      <h1 class="hero-title">
+        Journal de bord<br />
+        sur l'application des principes<br />
+        <em>SRE</em> à un indexeur Uniswap v4.<br />
+      </h1>
+      <p class="hero-desc">
+        Le gap entre la théorie SRE et une infrastructure blockchain qui tient
+        en production.
+      </p>
     </div>
 
-    <div class="articles-grid">
-      {
-        articles.map((article, index) => (
-          <a
-            href={`/articles/${article.slug}`}
-            class={`article-card ${index === 0 ? "featured" : ""}`}
-          >
-            <div class="block-number">
-              #{String(index + 1).padStart(4, "0")}
-            </div>
-            <div class="card-tag">
-              <span class="tag-dot" />
-              Article
-            </div>
-            <div class="card-title">{article.title}</div>
-            {index === 0 && (
-              <div class="card-excerpt">
-                {stripHtml(article.content || "")}...
+    <div class="articles-section">
+      <div class="section-header">
+        <span class="section-label">// articles récents</span>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="articles-grid">
+        {
+          articles.map((article, index) => (
+            <a
+              href={`/articles/${article.slug}`}
+              class={`article-card ${index === 0 ? "featured" : ""}`}
+            >
+              <div class="block-number">
+                #{String(index + 1).padStart(4, "0")}
               </div>
-            )}
-            <div class="card-footer">
-              <span class="read-more">Lire</span>
-              <div class="card-meta">
-                <span>
-                  {new Date(article.created).toLocaleDateString("fr-FR")}
-                </span>
+              <div class="card-tag">
+                <span class="tag-dot" />
+                Article
               </div>
-            </div>
-          </a>
-        ))
-      }
+              <div class="card-title">{article.title}</div>
+              {index === 0 && (
+                <div class="card-excerpt">
+                  {stripHtml(article.content || "")}...
+                </div>
+              )}
+              <div class="card-footer">
+                <span class="read-more">Lire</span>
+                <div class="card-meta">
+                  <span>
+                    {new Date(article.created).toLocaleDateString("fr-FR")}
+                  </span>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
     </div>
-  </div>
   </div>
 </Layout>
