@@ -1,7 +1,6 @@
-# indexer.blog — Journal de bord SRE
+# Blog
 
 Journal de bord sur l'application des principes SRE à un indexeur Uniswap V4.
-Le gap entre la théorie SRE et une infrastructure blockchain qui tient en production.
 
 ## Stack
 
@@ -24,7 +23,7 @@ src/
         └── [slug].astro    # Page article
 ```
 
-## Lancer le frontend Astro
+## Lancer Astro
 
 ```sh
 npm install
