@@ -120,7 +120,10 @@ const article = await pb.collection('articles').getFirstListItem(
     </div>
     <h1>{article.title}</h1>
     <div class="article-meta">
-      <span>{new Date(article.created).toLocaleDateString('fr-FR')}</span>
+      <span>Publié le {new Date(article.created).toLocaleDateString('fr-FR')}</span>
+      {new Date(article.updated).toDateString() !== new Date(article.created).toDateString() && (
+        <span>Modifié le {new Date(article.updated).toLocaleDateString('fr-FR')}</span>
+      )}
     </div>
   </div>
 
