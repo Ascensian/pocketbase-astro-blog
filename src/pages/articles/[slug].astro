@@ -105,6 +105,12 @@ const article = await pb.collection('articles').getFirstListItem(
       line-height: 1.7;
       color: #8aaab8;
     }
+
+    :global(.article-body img) {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
   </style>
 
   <div class="article-header">
