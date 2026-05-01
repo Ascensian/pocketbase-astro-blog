@@ -18,9 +18,11 @@ src/
 ├── lib/
 │   └── pocketbase.ts      # Client PocketBase
 └── pages/
-    ├── index.astro         # Liste des articles
-    └── articles/
-        └── [slug].astro    # Page article
+    ├── api/               # Endpoints API (SSR)
+    ├── articles/
+    │   └── [slug].astro   # Page article
+    ├── index.astro        # Liste des articles
+    └── ressources.astro   # Page ressources
 ```
 
 ## Lancer Astro
