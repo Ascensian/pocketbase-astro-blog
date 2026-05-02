@@ -39,6 +39,7 @@ const { title } = Astro.props;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        position: relative;
       }
 
       .logo {
@@ -70,6 +71,60 @@ const { title } = Astro.props;
 
       .nav-links a:hover {
         color: #00e5a0;
+      }
+
+      .burger-btn {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .burger-btn span {
+        display: block;
+        width: 22px;
+        height: 1.5px;
+        background: #4a6a7c;
+        transition: transform 0.2s, opacity 0.2s;
+      }
+
+      .burger-btn.open span:nth-child(1) {
+        transform: translateY(6.5px) rotate(45deg);
+      }
+
+      .burger-btn.open span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .burger-btn.open span:nth-child(3) {
+        transform: translateY(-6.5px) rotate(-45deg);
+      }
+
+      @media (max-width: 540px) {
+        .burger-btn {
+          display: flex;
+        }
+
+        .nav-links {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: #0a0e13;
+          border-bottom: 0.5px solid #1e2a35;
+          flex-direction: column;
+          padding: 16px 32px;
+          gap: 16px;
+          z-index: 100;
+        }
+
+        .nav-links.open {
+          display: flex;
+        }
       }
 
       main {
@@ -163,7 +218,13 @@ const { title } = Astro.props;
   <body>
     <nav>
       <a class="logo" href="/">Hugo GERARD</a>
-      <ul class="nav-links">
+      <button class="burger-btn" id="burgerBtn" aria-label="Menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
         <li><a href="/ressources">Ressources</a></li>
         <li>
           <a href="#" class="live-btn">
@@ -172,6 +233,17 @@ const { title } = Astro.props;
         </li>
       </ul>
     </nav>
+
+    <script>
+      const burgerBtn = document.getElementById("burgerBtn");
+      const navLinks = document.getElementById("navLinks");
+
+      burgerBtn?.addEventListener("click", () => {
+        const isOpen = navLinks?.classList.toggle("open");
+        burgerBtn.classList.toggle("open");
+        burgerBtn.setAttribute("aria-expanded", String(isOpen));
+      });
+    </script>
 
     <main>
       <slot />
