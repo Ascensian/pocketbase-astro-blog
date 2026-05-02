@@ -9,6 +9,28 @@ const ressources = await pb.collection('ressources').getFullList({
 function getFileUrl(record: any): string {
   return pb.files.getURL(record, record.file);
 }
+
+function parseLinks(raw: string): string[] {
+  return raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+}
+
+type LinkEntry = { url: string; path: string };
+
+function groupLinks(raw: string): Map<string, LinkEntry[]> {
+  const groups = new Map<string, LinkEntry[]>();
+  for (const url of parseLinks(raw)) {
+    let host = url;
+    let path = '';
+    try {
+      const u = new URL(url);
+      host = u.hostname.replace(/^www\./, '');
+      path = u.pathname + u.search;
+    } catch {}
+    if (!groups.has(host)) groups.set(host, []);
+    groups.get(host)!.push({ url, path });
+  }
+  return groups;
+}
 ---
 
 <Layout title="Ressources — Hugo GERARD">
@@ -17,55 +39,75 @@ function getFileUrl(record: any): string {
   </section>
 
   <section class="resources-grid">
-    {ressources.map((r: any) => (
-      <article class={`card card--${r.type}`}>
-        <div class="card-header">
-          <span class="card-type-badge">
-            {r.type === 'pdf' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10 9 9 9 8 9"/>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-              </svg>
+    {ressources.map((r: any) => {
+      const links = r.links ? parseLinks(r.links) : [];
+      return (
+        <article class={`card card--${r.type}`}>
+          <div class="card-header">
+            <span class="card-type-badge">
+              {r.type === 'pdf' ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+              )}
+              {r.type}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <h2 class="card-title">{r.title}</h2>
+            {r.description && <p class="card-desc">{r.description}</p>}
+          </div>
+
+          <div class="card-footer">
+            {r.type === 'pdf' && r.file ? (
+              <a href={getFileUrl(r)} target="_blank" rel="noopener noreferrer" class="card-link card-link--pdf">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Lire
+              </a>
+            ) : r.url ? (
+              <a href={r.url} target="_blank" rel="noopener noreferrer" class="card-link card-link--url">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                Ouvrir
+              </a>
+            ) : null}
+
+            {links.length > 0 && (
+              <button
+                class="card-link card-link--links"
+                data-modal={`modal-${r.id}`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                  <line x1="3" y1="6" x2="3.01" y2="6"/>
+                  <line x1="3" y1="12" x2="3.01" y2="12"/>
+                  <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                {links.length} lien{links.length > 1 ? 's' : ''}
+              </button>
             )}
-            {r.type}
-          </span>
-        </div>
-
-        <div class="card-body">
-          <h2 class="card-title">{r.title}</h2>
-          {r.description && <p class="card-desc">{r.description}</p>}
-        </div>
-
-        <div class="card-footer">
-          {r.type === 'pdf' && r.file ? (
-            <a href={getFileUrl(r)} target="_blank" rel="noopener noreferrer" class="card-link card-link--pdf">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-              Lire
-            </a>
-          ) : r.url ? (
-            <a href={r.url} target="_blank" rel="noopener noreferrer" class="card-link card-link--url">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                <polyline points="15 3 21 3 21 9"/>
-                <line x1="10" y1="14" x2="21" y2="3"/>
-              </svg>
-              Ouvrir
-            </a>
-          ) : null}
-        </div>
-      </article>
-    ))}
+          </div>
+        </article>
+      );
+    })}
   </section>
 
   {ressources.length === 0 && (
@@ -73,7 +115,78 @@ function getFileUrl(record: any): string {
       <span class="empty-label">// aucune ressource disponible</span>
     </div>
   )}
+
+  {ressources.filter((r: any) => r.links).map((r: any) => {
+    const links = parseLinks(r.links);
+    const groups = groupLinks(r.links);
+
+    return (
+      <dialog id={`modal-${r.id}`} class="links-modal">
+        <div class="modal-inner">
+          <div class="modal-header">
+            <div class="modal-title-block">
+              <h3 class="modal-title">{r.title}</h3>
+              <span class="modal-count">{links.length}</span>
+            </div>
+            <button class="modal-close" data-close={`modal-${r.id}`} aria-label="Fermer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-links">
+            {Array.from(groups.entries()).map(([host, items]) => (
+              <div class="modal-group">
+                <div class="modal-group-header">
+                  <span class="modal-group-host">{host}</span>
+                </div>
+                <ul class="modal-group-list">
+                  {items.map(({ url, path }) => (
+                    <li>
+                      <a href={url} target="_blank" rel="noopener noreferrer" class="modal-link">
+                        <span class="modal-link-path">
+                          {path && path !== '/' ? path : '/'}
+                        </span>
+                        <svg class="modal-link-arrow" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                          <polyline points="15 3 21 3 21 9"/>
+                          <line x1="10" y1="14" x2="21" y2="3"/>
+                        </svg>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </dialog>
+    );
+  })}
 </Layout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dialog = document.getElementById(btn.dataset.modal!) as HTMLDialogElement;
+      dialog?.showModal();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dialog = document.getElementById(btn.dataset.close!) as HTMLDialogElement;
+      dialog?.close();
+    });
+  });
+
+  document.querySelectorAll<HTMLDialogElement>('.links-modal').forEach(dialog => {
+    dialog.addEventListener('click', e => {
+      if (e.target === dialog) dialog.close();
+    });
+  });
+</script>
 
 <style>
   .hero {
@@ -178,6 +291,9 @@ function getFileUrl(record: any): string {
 
   .card-footer {
     margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .card-link {
@@ -192,6 +308,9 @@ function getFileUrl(record: any): string {
     padding: 8px 14px;
     border-radius: 2px;
     transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    background: transparent;
+    font-family: inherit;
   }
 
   .card-link--pdf {
@@ -214,6 +333,17 @@ function getFileUrl(record: any): string {
     border-color: rgba(0, 229, 160, 0.6);
   }
 
+  .card-link--links {
+    color: #7b9ab0;
+    border: 0.5px solid rgba(123, 154, 176, 0.3);
+  }
+
+  .card-link--links:hover {
+    color: #a8c4d4;
+    background: rgba(123, 154, 176, 0.08);
+    border-color: rgba(123, 154, 176, 0.5);
+  }
+
   .empty {
     padding: 80px 32px;
     text-align: center;
@@ -223,6 +353,189 @@ function getFileUrl(record: any): string {
     font-size: 12px;
     color: #2e4a5a;
     letter-spacing: 0.1em;
+  }
+
+  /* Modal */
+
+  @keyframes modal-in {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0)   scale(1); }
+  }
+
+  .links-modal {
+    border: 0.5px solid #1e2a35;
+    background: #05090e;
+    border-radius: 6px;
+    padding: 0;
+    width: min(520px, calc(100vw - 24px));
+    max-height: min(480px, calc(100vh - 48px));
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8), 0 0 0 0.5px #0d1520;
+  }
+
+  .links-modal::backdrop {
+    background: rgba(2, 5, 10, 0.8);
+    backdrop-filter: blur(3px);
+  }
+
+  .links-modal[open] {
+    display: flex;
+    flex-direction: column;
+    animation: modal-in 0.15s ease;
+  }
+
+  .modal-inner {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 0.5px solid #0f1820;
+    flex-shrink: 0;
+  }
+
+  .modal-title-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .modal-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #c8dae4;
+    letter-spacing: -0.01em;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .modal-count {
+    font-size: 10px;
+    color: #2e4a5a;
+    background: #0d1520;
+    border: 0.5px solid #1a2535;
+    border-radius: 10px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: #2e4a5a;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 3px;
+    transition: color 0.12s, background 0.12s;
+  }
+
+  .modal-close:hover {
+    color: #7b9ab0;
+    background: #0d1520;
+  }
+
+  .modal-links {
+    padding: 8px 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .modal-links::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .modal-links::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .modal-links::-webkit-scrollbar-thumb {
+    background: #1a2535;
+    border-radius: 2px;
+  }
+
+  .modal-group {
+    margin-bottom: 4px;
+  }
+
+  .modal-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .modal-group-header {
+    padding: 6px 16px 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modal-group-host {
+    font-size: 10px;
+    font-weight: 700;
+    color: #3a5a70;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .modal-group-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .modal-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px 8px 20px;
+    text-decoration: none;
+    transition: background 0.1s;
+    border-left: 2px solid transparent;
+  }
+
+  .modal-link:hover {
+    background: #0a0f18;
+    border-left-color: #00e5a0;
+  }
+
+  .modal-link:hover .modal-link-path {
+    color: #c8dae4;
+  }
+
+  .modal-link:hover .modal-link-arrow {
+    color: #00e5a0;
+    transform: translate(1px, -1px);
+  }
+
+  .modal-link-path {
+    flex: 1;
+    font-size: 12px;
+    color: #5a7a8e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.1s;
+  }
+
+  .modal-link-arrow {
+    color: #1e2a35;
+    flex-shrink: 0;
+    transition: color 0.1s, transform 0.1s;
   }
 
   @media (max-width: 540px) {
@@ -237,6 +550,12 @@ function getFileUrl(record: any): string {
     .resources-grid {
       padding: 16px;
       grid-template-columns: 1fr;
+    }
+
+    .links-modal {
+      width: calc(100vw - 16px);
+      max-height: calc(100vh - 32px);
+      border-radius: 4px;
     }
   }
 </style>
